@@ -1,5 +1,16 @@
-# Vue 3 + Vite
+# TaskAI - Frontend (Vue.js 3 + Vite)
 
-This template should help get you started developing with Vue 3 in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+Interfaz de usuario reactiva para la gestión de tareas.
 
-Learn more about IDE Support for Vue in the [Vue Docs Scaling up Guide](https://vuejs.org/guide/scaling-up/tooling.html#ide-support).
+## Requisitos Previos
+- Node.js (versión 18 o superior)
+- Backend de Laravel en ejecución en `http://127.0.0.1:8000`
+
+## Instalación y Ejecución
+
+```bash
+# 1. Instalar dependencias
+npm install
+
+# 2. Iniciar servidor de desarrollo
+npm run dev
