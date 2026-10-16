@@ -1,0 +1,148 @@
+openapi: 3.0.0
+info:
+  title: TaskAI REST API
+  description: Especificación técnica OpenAPI para el Sistema de Gestión de Tareas Inteligente.
+  version: 1.0.0
+servers:
+  - url: http://127.0.0.1:8000
+    description: Servidor local de desarrollo
+
+paths:
+  /api/tasks:
+    get:
+      summary: RF-04 - Consulta de tareas
+      description: Retorna el listado de todas las tareas activas (excluye las eliminadas por Soft Delete).
+      responses:
+        '200':
+          description: Listado obtenido exitosamente.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Task'
+
+    post:
+      summary: RF-01, RF-02, RF-03 - Registro de tareas
+      description: Registra una nueva tarea aplicando validación de fecha límite (>= hoy) y asignación automática de prioridad Alta si el título contiene "urgente".
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - titulo
+                - fecha_limite
+              properties:
+                titulo:
+                  type: string
+                  example: "Atender incidente urgente en servidor"
+                descripcion:
+                  type: string
+                  nullable: true
+                  example: "Revisar logs y balanceador de carga"
+                prioridad:
+                  type: string
+                  enum: [Baja, Media, Alta]
+                  default: Media
+                  example: "Media"
+                fecha_limite:
+                  type: string
+                  format: date
+                  example: "2026-10-25"
+      responses:
+        '201':
+          description: Tarea creada exitosamente.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        '400':
+          description: Fecha límite anterior a la actual (RF-03).
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "La fecha límite no puede ser anterior a la fecha actual."
+        '422':
+          description: Error de validación de campos requeridos.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Error de validación"
+                  errors:
+                    type: object
+
+  /api/tasks/{id}:
+    delete:
+      summary: RF-05 - Eliminación de tareas
+      description: Ejecuta una eliminación lógica (Soft Delete) sobre la tarea especificada.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID de la tarea a eliminar
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Tarea eliminada exitosamente.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Tarea eliminada exitosamente"
+        '404':
+          description: Tarea no encontrada.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Tarea no encontrada"
+
+components:
+  schemas:
+    Task:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        titulo:
+          type: string
+          example: "Atender incidente urgente en servidor"
+        descripcion:
+          type: string
+          nullable: true
+          example: "Revisar logs y balanceador de carga"
+        prioridad:
+          type: string
+          example: "Alta"
+        fecha_limite:
+          type: string
+          format: date
+          example: "2026-10-25"
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        deleted_at:
+          type: string
+          format: date-time
+          nullable: true
